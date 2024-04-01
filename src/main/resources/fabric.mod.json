@@ -1,0 +1,41 @@
+{
+	"schemaVersion": 1,
+	"id": "server-notify",
+	"version": "${version}",
+	"name": "Server Notify",
+	"description": "Show notifications to players that join your server!",
+	"authors": [
+		"Me!"
+	],
+	"contact": {
+		"homepage": "https://modrinth.com/project/server-notify",
+		"sources": "https://github.com/dooji2/server-notify/"
+	},
+	"license": "ARR",
+	"icon": "assets/server-notify/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.dooji.sn.ServerNotify"
+		],
+		"client": [
+			"com.dooji.sn.ServerNotifyClient"
+		]
+	},
+	"mixins": [
+		"server-notify.mixins.json",
+		{
+			"config": "server-notify.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.15.7",
+		"minecraft": "~1.19.2",
+		"java": ">=17",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}
