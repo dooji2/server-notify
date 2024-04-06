@@ -25,14 +25,64 @@ public class NotificationCommands {
                 .then(CommandManager.literal("new")
                         .requires(source -> source.hasPermissionLevel(2)
                                 || source.hasPermissionLevel(source.getServer().getOpPermissionLevel()))
-                        .then(CommandManager.argument("friendly_name", StringArgumentType.word())
+                        .then(CommandManager.argument("friendly_name", StringArgumentType.string())
                                 .then(CommandManager.argument("type", StringArgumentType.word())
-                                        .then(CommandManager.argument("sound_namespace", StringArgumentType.word())
-                                                .then(CommandManager.argument("sound_path", StringArgumentType.word())
+                                        .then(CommandManager.literal("texture")
+                                                .then(CommandManager
+                                                        .argument("sound_namespace", StringArgumentType.word())
                                                         .then(CommandManager
-                                                                .argument("namespace", StringArgumentType.word())
+                                                                .argument("sound_path", StringArgumentType.string())
                                                                 .then(CommandManager
-                                                                        .argument("texture", StringArgumentType.word())
+                                                                        .argument("namespace",
+                                                                                StringArgumentType.word())
+                                                                        .then(CommandManager
+                                                                                .argument("texture",
+                                                                                        StringArgumentType.string())
+                                                                                .then(CommandManager
+                                                                                        .argument("width",
+                                                                                                IntegerArgumentType
+                                                                                                        .integer())
+                                                                                        .then(CommandManager.argument(
+                                                                                                "height",
+                                                                                                IntegerArgumentType
+                                                                                                        .integer())
+                                                                                                .then(CommandManager
+                                                                                                        .argument(
+                                                                                                                "dismiss_message",
+                                                                                                                BoolArgumentType
+                                                                                                                        .bool())
+                                                                                                        .then(CommandManager
+                                                                                                                .argument(
+                                                                                                                        "alwaysShow",
+                                                                                                                        BoolArgumentType
+                                                                                                                                .bool())
+                                                                                                                .executes(
+                                                                                                                        context -> executeAddNotification(
+                                                                                                                                context)))))))))))
+                                        .then(CommandManager.literal("text")
+                                                .then(CommandManager
+                                                        .argument("sound_namespace", StringArgumentType.word())
+                                                        .then(CommandManager
+                                                                .argument("sound_path", StringArgumentType.string())
+                                                                .then(CommandManager
+                                                                        .argument("message",
+                                                                                StringArgumentType.string())
+                                                                        .then(CommandManager
+                                                                                .argument("dismiss_message",
+                                                                                        BoolArgumentType.bool())
+                                                                                .then(CommandManager
+                                                                                        .argument("alwaysShow",
+                                                                                                BoolArgumentType.bool())
+                                                                                        .executes(
+                                                                                                context -> executeAddNotification(
+                                                                                                        context))))))))
+                                        .then(CommandManager.literal("url")
+                                                .then(CommandManager.argument("url", StringArgumentType.string())
+                                                        .then(CommandManager
+                                                                .argument("sound_namespace", StringArgumentType.word())
+                                                                .then(CommandManager
+                                                                        .argument("sound_path",
+                                                                                StringArgumentType.string())
                                                                         .then(CommandManager
                                                                                 .argument("width",
                                                                                         IntegerArgumentType.integer())
@@ -63,20 +113,70 @@ public class NotificationCommands {
                         .requires(source -> source.hasPermissionLevel(2)
                                 || source.hasPermissionLevel(source.getServer().getOpPermissionLevel()))
                         .then(CommandManager.argument("uuid", StringArgumentType.word())
+                                .suggests((context, builder) -> {
+                                    JsonObject configObject = NotificationConfig.loadConfig();
+                                    JsonArray notificationsArray = configObject.getAsJsonArray("notifications");
+                                    for (int i = 0; i < notificationsArray.size(); i++) {
+                                        JsonObject notification = notificationsArray.get(i).getAsJsonObject();
+                                        String uuid = notification.get("name").getAsString();
+                                        builder.suggest(uuid);
+                                    }
+                                    return builder.buildFuture();
+                                })
                                 .executes(context -> executeRemoveNotification(context))))
                 .then(CommandManager.literal("edit")
                         .requires(source -> source.hasPermissionLevel(2)
                                 || source.hasPermissionLevel(source.getServer().getOpPermissionLevel()))
                         .then(CommandManager.argument("uuid", StringArgumentType.word())
+                                .suggests((context, builder) -> {
+                                    JsonObject configObject = NotificationConfig.loadConfig();
+                                    JsonArray notificationsArray = configObject.getAsJsonArray("notifications");
+                                    for (int i = 0; i < notificationsArray.size(); i++) {
+                                        JsonObject notification = notificationsArray.get(i).getAsJsonObject();
+                                        String uuid = notification.get("name").getAsString();
+                                        builder.suggest(uuid);
+                                    }
+                                    return builder.buildFuture();
+                                })
                                 .then(CommandManager.argument("element", StringArgumentType.word())
                                         .suggests((context, builder) -> {
+                                            String type = context.getArgument("type", String.class);
 
-                                            String[] suggestedElements = { "friendly_name", "type", "sound_namespace",
-                                                    "sound_path", "namespace", "texture", "width", "height",
-                                                    "dismiss_message", "alwaysShow" };
-
-                                            for (String element : suggestedElements) {
-                                                builder.suggest(element);
+                                            switch (type.toLowerCase()) {
+                                                case "texture":
+                                                    builder.suggest("friendly_name");
+                                                    builder.suggest("type");
+                                                    builder.suggest("sound_namespace");
+                                                    builder.suggest("sound_path");
+                                                    builder.suggest("namespace");
+                                                    builder.suggest("texture");
+                                                    builder.suggest("width");
+                                                    builder.suggest("height");
+                                                    builder.suggest("dismiss_message");
+                                                    builder.suggest("alwaysShow");
+                                                    break;
+                                                case "text":
+                                                    builder.suggest("friendly_name");
+                                                    builder.suggest("type");
+                                                    builder.suggest("sound_namespace");
+                                                    builder.suggest("sound_path");
+                                                    builder.suggest("message");
+                                                    builder.suggest("dismiss_message");
+                                                    builder.suggest("alwaysShow");
+                                                    break;
+                                                case "url":
+                                                    builder.suggest("friendly_name");
+                                                    builder.suggest("type");
+                                                    builder.suggest("sound_namespace");
+                                                    builder.suggest("sound_path");
+                                                    builder.suggest("url");
+                                                    builder.suggest("width");
+                                                    builder.suggest("height");
+                                                    builder.suggest("dismiss_message");
+                                                    builder.suggest("alwaysShow");
+                                                    break;
+                                                default:
+                                                    break;
                                             }
 
                                             return builder.buildFuture();
@@ -87,6 +187,16 @@ public class NotificationCommands {
                         .requires(source -> source.hasPermissionLevel(2)
                                 || source.hasPermissionLevel(source.getServer().getOpPermissionLevel()))
                         .then(CommandManager.argument("uuid", StringArgumentType.word())
+                                .suggests((context, builder) -> {
+                                    JsonObject configObject = NotificationConfig.loadConfig();
+                                    JsonArray notificationsArray = configObject.getAsJsonArray("notifications");
+                                    for (int i = 0; i < notificationsArray.size(); i++) {
+                                        JsonObject notification = notificationsArray.get(i).getAsJsonObject();
+                                        String uuid = notification.get("name").getAsString();
+                                        builder.suggest(uuid);
+                                    }
+                                    return builder.buildFuture();
+                                })
                                 .executes(context -> executeNotificationInfo(context))));
 
         dispatcher.register(command);
@@ -94,17 +204,46 @@ public class NotificationCommands {
 
     private static int executeAddNotification(CommandContext<ServerCommandSource> context) {
         ServerCommandSource source = context.getSource();
-        addNotification(source,
-                context.getArgument("friendly_name", String.class),
-                context.getArgument("type", String.class),
-                context.getArgument("sound_namespace", String.class),
-                context.getArgument("sound_path", String.class),
-                context.getArgument("namespace", String.class),
-                context.getArgument("texture", String.class),
-                context.getArgument("width", Integer.class),
-                context.getArgument("height", Integer.class),
-                context.getArgument("dismiss_message", Boolean.class),
-                context.getArgument("alwaysShow", Boolean.class));
+        String friendlyName = context.getArgument("friendly_name", String.class);
+        String type = context.getArgument("type", String.class);
+        String soundNamespace = context.getArgument("sound_namespace", String.class);
+        String soundPath = context.getArgument("sound_path", String.class);
+        boolean dismissMessage = context.getArgument("dismiss_message", Boolean.class);
+        boolean alwaysShow = context.getArgument("alwaysShow", Boolean.class);
+
+        switch (type.toLowerCase()) {
+            case "texture":
+                addNotification(source, friendlyName, type, soundNamespace, soundPath,
+                        context.getArgument("namespace", String.class),
+                        context.getArgument("texture", String.class),
+                        context.getArgument("width", Integer.class),
+                        context.getArgument("height", Integer.class),
+                        dismissMessage,
+                        alwaysShow);
+                break;
+            case "text":
+                addNotification(source, friendlyName, type, soundNamespace, soundPath,
+                        context.getArgument("message", String.class),
+                        "",
+                        0,
+                        0,
+                        dismissMessage,
+                        alwaysShow);
+                break;
+            case "url":
+                addNotification(source, friendlyName, type, soundNamespace, soundPath,
+                        context.getArgument("url", String.class),
+                        "",
+                        context.getArgument("width", Integer.class),
+                        context.getArgument("height", Integer.class),
+                        dismissMessage,
+                        alwaysShow);
+                break;
+            default:
+                source.sendError(Text.of("Invalid notification type."));
+                return 0;
+        }
+
         return 1;
     }
 
@@ -161,12 +300,75 @@ public class NotificationCommands {
     private static int executeNotificationInfo(CommandContext<ServerCommandSource> context) {
         ServerCommandSource source = context.getSource();
         String uuid = context.getArgument("uuid", String.class);
-        displayNotificationInfo(source, uuid);
-        return 1;
+
+        JsonObject configObject = NotificationConfig.loadConfig();
+        JsonArray notificationsArray = configObject.getAsJsonArray("notifications");
+
+        for (int i = 0; i < notificationsArray.size(); i++) {
+            JsonObject notification = notificationsArray.get(i).getAsJsonObject();
+            if (notification.get("name").getAsString().equals(uuid)) {
+                String type = notification.get("type").getAsString();
+                switch (type.toLowerCase()) {
+                    case "texture":
+                        displayTextureNotificationInfo(source, notification);
+                        break;
+                    case "text":
+                        displayTextNotificationInfo(source, notification);
+                        break;
+                    case "url":
+                        displayURLNotificationInfo(source, notification);
+                        break;
+                    default:
+                        source.sendError(Text.of("Invalid notification type."));
+                        return 0;
+                }
+                return 1;
+            }
+        }
+        source.sendError(Text.literal("Notification with UUID " + uuid + " not found.").formatted(Formatting.RED));
+        return 0;
+    }
+
+    private static void displayTextureNotificationInfo(ServerCommandSource source, JsonObject notification) {
+        source.sendFeedback(Text.literal("Notification Info for UUID: " + notification.get("name").getAsString())
+                .formatted(Formatting.YELLOW), true);
+        source.sendFeedback(Text.literal("Friendly Name: " + notification.get("friendly_name").getAsString()), false);
+        source.sendFeedback(Text.literal("Type: Texture"), false);
+        source.sendFeedback(Text.literal("Namespace: " + notification.get("namespace").getAsString()), false);
+        source.sendFeedback(Text.literal("Texture: " + notification.get("texture").getAsString()), false);
+        source.sendFeedback(Text.literal("Width: " + notification.get("width").getAsInt()), false);
+        source.sendFeedback(Text.literal("Height: " + notification.get("height").getAsInt()), false);
+        source.sendFeedback(Text.literal("Dismiss Message: " + notification.get("dismiss_message").getAsBoolean()),
+                false);
+        source.sendFeedback(Text.literal("Always Show: " + notification.get("alwaysShow").getAsBoolean()), false);
+    }
+
+    private static void displayTextNotificationInfo(ServerCommandSource source, JsonObject notification) {
+        source.sendFeedback(Text.literal("Notification Info for UUID: " + notification.get("name").getAsString())
+                .formatted(Formatting.YELLOW), true);
+        source.sendFeedback(Text.literal("Friendly Name: " + notification.get("friendly_name").getAsString()), false);
+        source.sendFeedback(Text.literal("Type: Text"), false);
+        source.sendFeedback(Text.literal("Message: " + notification.get("message").getAsString()), false);
+        source.sendFeedback(Text.literal("Dismiss Message: " + notification.get("dismiss_message").getAsBoolean()),
+                false);
+        source.sendFeedback(Text.literal("Always Show: " + notification.get("alwaysShow").getAsBoolean()), false);
+    }
+
+    private static void displayURLNotificationInfo(ServerCommandSource source, JsonObject notification) {
+        source.sendFeedback(Text.literal("Notification Info for UUID: " + notification.get("name").getAsString())
+                .formatted(Formatting.YELLOW), true);
+        source.sendFeedback(Text.literal("Friendly Name: " + notification.get("friendly_name").getAsString()), false);
+        source.sendFeedback(Text.literal("Type: URL"), false);
+        source.sendFeedback(Text.literal("URL: " + notification.get("url").getAsString()), false);
+        source.sendFeedback(Text.literal("Width: " + notification.get("width").getAsInt()), false);
+        source.sendFeedback(Text.literal("Height: " + notification.get("height").getAsInt()), false);
+        source.sendFeedback(Text.literal("Dismiss Message: " + notification.get("dismiss_message").getAsBoolean()),
+                false);
+        source.sendFeedback(Text.literal("Always Show: " + notification.get("alwaysShow").getAsBoolean()), false);
     }
 
     private static void addNotification(ServerCommandSource source, String friendlyName, String type,
-            String soundNamespace, String soundPath, String namespace, String texture, int width, int height,
+            String soundNamespace, String soundPath, String url, String texture, int width, int height,
             boolean dismissMessage, boolean alwaysShow) {
         JsonObject notification = new JsonObject();
         notification.addProperty("friendly_name", friendlyName);
@@ -174,18 +376,36 @@ public class NotificationCommands {
         notification.addProperty("type", type);
         notification.addProperty("sound_namespace", soundNamespace);
         notification.addProperty("sound_path", soundPath);
-        notification.addProperty("namespace", namespace);
-        notification.addProperty("texture", texture);
-        notification.addProperty("width", width);
-        notification.addProperty("height", height);
-        notification.addProperty("dismiss_message", dismissMessage);
-        notification.addProperty("alwaysShow", alwaysShow);
+
+        switch (type.toLowerCase()) {
+            case "texture":
+                notification.addProperty("namespace", url);
+                notification.addProperty("texture", texture);
+                notification.addProperty("width", width);
+                notification.addProperty("height", height);
+                notification.addProperty("dismiss_message", dismissMessage);
+                notification.addProperty("alwaysShow", alwaysShow);
+                break;
+            case "text":
+                notification.addProperty("message", url);
+                notification.addProperty("dismiss_message", dismissMessage);
+                notification.addProperty("alwaysShow", alwaysShow);
+                break;
+            case "url":
+                notification.addProperty("url", url);
+                notification.addProperty("width", width);
+                notification.addProperty("height", height);
+                notification.addProperty("dismiss_message", dismissMessage);
+                notification.addProperty("alwaysShow", alwaysShow);
+                break;
+            default:
+                source.sendError(Text.of("Invalid notification type."));
+                return;
+        }
 
         JsonObject configObject = NotificationConfig.loadConfig();
         JsonArray notificationsArray = configObject.getAsJsonArray("notifications");
-
         notificationsArray.add(notification);
-
         NotificationConfig.saveConfig(configObject);
 
         source.sendFeedback(Text.of("Notification added successfully."), true);
@@ -281,36 +501,6 @@ public class NotificationCommands {
                 NotificationConfig.saveConfig(configObject);
                 source.sendFeedback(Text.literal("Notification with UUID " + uuid + " edited successfully.")
                         .formatted(Formatting.GREEN), true);
-                return;
-            }
-        }
-        source.sendFeedback(Text.literal("Notification with UUID " + uuid + " not found.").formatted(Formatting.RED),
-                true);
-    }
-
-    private static void displayNotificationInfo(ServerCommandSource source, String uuid) {
-        JsonObject configObject = NotificationConfig.loadConfig();
-        JsonArray notificationsArray = configObject.getAsJsonArray("notifications");
-
-        for (int i = 0; i < notificationsArray.size(); i++) {
-            JsonObject notification = notificationsArray.get(i).getAsJsonObject();
-            if (notification.get("name").getAsString().equals(uuid)) {
-                source.sendFeedback(Text.literal("Notification Info for UUID: " + uuid).formatted(Formatting.YELLOW),
-                        true);
-                source.sendFeedback(Text.literal("Friendly Name: " + notification.get("friendly_name").getAsString()),
-                        false);
-                source.sendFeedback(Text.literal("Type: " + notification.get("type").getAsString()), false);
-                source.sendFeedback(
-                        Text.literal("Sound Namespace: " + notification.get("sound_namespace").getAsString()), false);
-                source.sendFeedback(Text.literal("Sound Path: " + notification.get("sound_path").getAsString()), false);
-                source.sendFeedback(Text.literal("Namespace: " + notification.get("namespace").getAsString()), false);
-                source.sendFeedback(Text.literal("Texture: " + notification.get("texture").getAsString()), false);
-                source.sendFeedback(Text.literal("Width: " + notification.get("width").getAsInt()), false);
-                source.sendFeedback(Text.literal("Height: " + notification.get("height").getAsInt()), false);
-                source.sendFeedback(
-                        Text.literal("Dismiss Message: " + notification.get("dismiss_message").getAsBoolean()), false);
-                source.sendFeedback(Text.literal("Always Show: " + notification.get("alwaysShow").getAsBoolean()),
-                        false);
                 return;
             }
         }

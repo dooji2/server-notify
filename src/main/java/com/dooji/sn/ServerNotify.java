@@ -50,6 +50,15 @@ public class ServerNotify implements ModInitializer {
 
 							NotificationPacket.send((ServerPlayerEntity) handler.player, name, type, sound_namespace,
 									sound_path, message, dismiss_button, dismiss_message, alwaysShow);
+						} else if (type.equals("url")) {
+							String url = notification.get("url").getAsString();
+							int width = notification.get("width").getAsInt();
+							int height = notification.get("height").getAsInt();
+							boolean dismiss_message = notification.get("dismiss_message").getAsBoolean();
+							boolean alwaysShow = notification.get("alwaysShow").getAsBoolean();
+
+							NotificationPacket.send((ServerPlayerEntity) handler.player, name, type, sound_namespace,
+									sound_path, url, width, height, dismiss_message, alwaysShow);
 						}
 					}
 				}

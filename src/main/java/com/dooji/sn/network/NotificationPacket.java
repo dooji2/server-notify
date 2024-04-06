@@ -37,4 +37,20 @@ public class NotificationPacket {
         buf.writeBoolean(alwaysShow);
         ServerPlayNetworking.send(player, new Identifier("server-notify", "notification_packet"), buf);
     }
+
+    public static void send(ServerPlayerEntity player, String name, String type, String sound_namespace,
+            String sound_path, String url, int width, int height, boolean dismiss_message,
+            boolean alwaysShow) {
+        PacketByteBuf buf = PacketByteBufs.create();
+        buf.writeString(name);
+        buf.writeString(type);
+        buf.writeString(sound_namespace);
+        buf.writeString(sound_path);
+        buf.writeString(url);
+        buf.writeInt(width);
+        buf.writeInt(height);
+        buf.writeBoolean(dismiss_message);
+        buf.writeBoolean(alwaysShow);
+        ServerPlayNetworking.send(player, new Identifier("server-notify", "notification_packet"), buf);
+    }
 }

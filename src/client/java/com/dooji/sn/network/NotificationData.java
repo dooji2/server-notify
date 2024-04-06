@@ -8,6 +8,7 @@ public class NotificationData {
     private String message = null;
     private String namespace = null;
     private String texture = null;
+    private String url = null;
     private int width = 0;
     private int height = 0;
     private boolean dismiss_button = false;
@@ -40,6 +41,19 @@ public class NotificationData {
         this.alwaysShow = alwaysShow;
     }
 
+    public NotificationData(String name, String type, String sound_namespace, String sound_path, String url, int width,
+            int height, boolean dismiss_message, boolean alwaysShow) {
+        this.name = name;
+        this.type = type;
+        this.sound_namespace = sound_namespace;
+        this.sound_path = sound_path;
+        this.url = url;
+        this.width = width;
+        this.height = height;
+        this.dismiss_message = dismiss_message;
+        this.alwaysShow = alwaysShow;
+    }
+
     public String getName() {
         return name;
     }
@@ -54,6 +68,10 @@ public class NotificationData {
 
     public String getSoundPath() {
         return sound_path;
+    }
+
+    public String getURL() {
+        return url;
     }
 
     public String getNamespace() {
