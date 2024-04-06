@@ -68,14 +68,18 @@ public class NotificationCommands {
                                                                         .argument("message",
                                                                                 StringArgumentType.string())
                                                                         .then(CommandManager
-                                                                                .argument("dismiss_message",
+                                                                                .argument("dismiss_button",
                                                                                         BoolArgumentType.bool())
                                                                                 .then(CommandManager
-                                                                                        .argument("alwaysShow",
+                                                                                        .argument("dismiss_message",
                                                                                                 BoolArgumentType.bool())
-                                                                                        .executes(
-                                                                                                context -> executeAddNotification(
-                                                                                                        context))))))))
+                                                                                        .then(CommandManager
+                                                                                                .argument("alwaysShow",
+                                                                                                        BoolArgumentType
+                                                                                                                .bool())
+                                                                                                .executes(
+                                                                                                        context -> executeAddNotification(
+                                                                                                                context)))))))))
                                         .then(CommandManager.literal("url")
                                                 .then(CommandManager.argument("url", StringArgumentType.string())
                                                         .then(CommandManager
@@ -161,6 +165,7 @@ public class NotificationCommands {
                                                     builder.suggest("sound_namespace");
                                                     builder.suggest("sound_path");
                                                     builder.suggest("message");
+                                                    builder.suggest("dismiss_button");
                                                     builder.suggest("dismiss_message");
                                                     builder.suggest("alwaysShow");
                                                     break;
@@ -208,6 +213,7 @@ public class NotificationCommands {
         String type = context.getArgument("type", String.class);
         String soundNamespace = context.getArgument("sound_namespace", String.class);
         String soundPath = context.getArgument("sound_path", String.class);
+        boolean dismissButton = context.getArgument("dismiss_button", Boolean.class);
         boolean dismissMessage = context.getArgument("dismiss_message", Boolean.class);
         boolean alwaysShow = context.getArgument("alwaysShow", Boolean.class);
 
@@ -218,6 +224,7 @@ public class NotificationCommands {
                         context.getArgument("texture", String.class),
                         context.getArgument("width", Integer.class),
                         context.getArgument("height", Integer.class),
+                        false,
                         dismissMessage,
                         alwaysShow);
                 break;
@@ -227,6 +234,7 @@ public class NotificationCommands {
                         "",
                         0,
                         0,
+                        dismissButton,
                         dismissMessage,
                         alwaysShow);
                 break;
@@ -236,6 +244,7 @@ public class NotificationCommands {
                         "",
                         context.getArgument("width", Integer.class),
                         context.getArgument("height", Integer.class),
+                        false,
                         dismissMessage,
                         alwaysShow);
                 break;
@@ -369,7 +378,7 @@ public class NotificationCommands {
 
     private static void addNotification(ServerCommandSource source, String friendlyName, String type,
             String soundNamespace, String soundPath, String url, String texture, int width, int height,
-            boolean dismissMessage, boolean alwaysShow) {
+            boolean dismissButton, boolean dismissMessage, boolean alwaysShow) {
         JsonObject notification = new JsonObject();
         notification.addProperty("friendly_name", friendlyName);
         notification.addProperty("name", java.util.UUID.randomUUID().toString());
@@ -388,6 +397,7 @@ public class NotificationCommands {
                 break;
             case "text":
                 notification.addProperty("message", url);
+                notification.addProperty("dismiss_button", dismissButton);
                 notification.addProperty("dismiss_message", dismissMessage);
                 notification.addProperty("alwaysShow", alwaysShow);
                 break;
