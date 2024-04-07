@@ -10,11 +10,18 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.client.sound.PositionedSoundInstance;
+import net.minecraft.client.texture.NativeImage;
+import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.sound.SoundEvent;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.net.URL;
 
 public class URLTextureNotificationScreen extends Screen {
     private final NotificationData notificationData;
-    private final Identifier URLImage;
+    private static NativeImageBackedTexture texture2;
+    private static BufferedImage bimage;
 
     private SoundEvent notificationSound;
     private String type;
@@ -28,14 +35,47 @@ public class URLTextureNotificationScreen extends Screen {
 
     private boolean soundPlayed = false;
 
-    public URLTextureNotificationScreen(Identifier URLImage, NotificationData notificationData, String type) {
+    public URLTextureNotificationScreen(NotificationData notificationData, String type) {
         super(Text.literal(""));
-        this.URLImage = URLImage;
         this.notificationData = notificationData;
         this.type = type;
         this.notificationSound = createSoundEvent(notificationData.getSoundNamespace(),
                 notificationData.getSoundPath());
 
+        try {
+            bimage = ImageIO.read(new URL(notificationData.getURL()));
+
+            if (bimage != null) {
+                NativeImage nimage = new NativeImage(bimage.getWidth(), bimage.getHeight(), false);
+                texture2 = new NativeImageBackedTexture(nimage);
+
+                convertToNativeImage(bimage);
+
+                texture2.upload();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void convertToNativeImage(BufferedImage bufferedImage) {
+        int width = bufferedImage.getWidth();
+        int height = bufferedImage.getHeight();
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                int argbColor = bufferedImage.getRGB(x, y);
+                int abgrColor = toAbgr(argbColor);
+                texture2.getImage().setColor(x, y, abgrColor);
+            }
+        }
+    }
+
+    private static int toAbgr(int rgb) {
+        int a = (rgb >> 24) & 255;
+        int r = (rgb >> 16) & 255;
+        int g = (rgb >> 8) & 255;
+        int b = (rgb) & 255;
+        return a << 24 | b << 16 | g << 8 | r;
     }
 
     private SoundEvent createSoundEvent(String namespace, String path) {
@@ -54,8 +94,16 @@ public class URLTextureNotificationScreen extends Screen {
         playNotificationSound();
 
         renderBackground(matrices);
-        renderTexture(matrices, width / 2, height / 2, notificationData.getWidth(),
-                notificationData.getHeight());
+
+        if (bimage != null) {
+            renderTexture(matrices, width / 2, height / 2, notificationData.getWidth(),
+                    notificationData.getHeight());
+        } else {
+            super.close();
+
+            ErrorScreen notificationScreen = new ErrorScreen(notificationData, type, "nullbimage");
+            client.setScreen(notificationScreen);
+        }
 
         if (notificationData.isDismissShow()) {
             double alpha = calculateAlpha();
@@ -70,7 +118,8 @@ public class URLTextureNotificationScreen extends Screen {
     }
 
     private void renderTexture(MatrixStack matrices, int x, int y, int width, int height) {
-        RenderSystem.setShaderTexture(0, URLImage);
+        RenderSystem.setShaderTexture(0, client.getTextureManager().registerDynamicTexture("server-notification",
+                texture2));
         RenderSystem.enableBlend();
 
         int textureX = x - width / 2;
