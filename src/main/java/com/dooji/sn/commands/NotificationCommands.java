@@ -213,7 +213,12 @@ public class NotificationCommands {
         String type = context.getArgument("type", String.class);
         String soundNamespace = context.getArgument("sound_namespace", String.class);
         String soundPath = context.getArgument("sound_path", String.class);
-        boolean dismissButton = context.getArgument("dismiss_button", Boolean.class);
+        boolean dismissButton = false;
+
+        if (type.toLowerCase() == "text") {
+            dismissButton = context.getArgument("dismiss_button", Boolean.class);
+        }
+
         boolean dismissMessage = context.getArgument("dismiss_message", Boolean.class);
         boolean alwaysShow = context.getArgument("alwaysShow", Boolean.class);
 
@@ -224,7 +229,7 @@ public class NotificationCommands {
                         context.getArgument("texture", String.class),
                         context.getArgument("width", Integer.class),
                         context.getArgument("height", Integer.class),
-                        false,
+                        dismissButton,
                         dismissMessage,
                         alwaysShow);
                 break;
@@ -244,7 +249,7 @@ public class NotificationCommands {
                         "",
                         context.getArgument("width", Integer.class),
                         context.getArgument("height", Integer.class),
-                        false,
+                        dismissButton,
                         dismissMessage,
                         alwaysShow);
                 break;
