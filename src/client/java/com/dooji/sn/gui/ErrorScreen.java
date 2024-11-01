@@ -2,11 +2,12 @@ package com.dooji.sn.gui;
 
 import com.dooji.sn.network.ClientPacketHandler;
 import com.dooji.sn.network.NotificationData;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.client.sound.PositionedSoundInstance;
@@ -43,7 +44,13 @@ public class ErrorScreen extends Screen {
 
     private SoundEvent createSoundEvent(String namespace, String path) {
         Identifier soundId = new Identifier(namespace, path);
-        return new SoundEvent(soundId);
+
+        if (!Registries.SOUND_EVENT.containsId(soundId)) {
+            SoundEvent soundEvent = SoundEvent.of(soundId);
+            Registry.register(Registries.SOUND_EVENT, soundId, soundEvent);
+        }
+
+        return Registries.SOUND_EVENT.get(soundId);
     }
 
     @Override
@@ -52,35 +59,31 @@ public class ErrorScreen extends Screen {
     }
 
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
 
         playNotificationSound();
 
-        renderBackground(matrices);
-        renderTexture(matrices, width / 2, height / 2, 500,
+        renderBackground(context);
+        renderTexture(context, width / 2, height / 2, 500,
                 281);
 
         if (notificationData.isDismissShow()) {
             double alpha = calculateAlpha();
 
-            renderDismissText(matrices, MinecraftClient.getInstance().textRenderer, alpha);
+            renderDismissText(context, MinecraftClient.getInstance().textRenderer, alpha);
 
             timer += delta;
             timer = timer % fullAnimationLength;
         }
 
-        super.render(matrices, mouseX, mouseY, delta);
+        super.render(context, mouseX, mouseY, delta);
     }
 
-    private void renderTexture(MatrixStack matrices, int x, int y, int width, int height) {
-        RenderSystem.setShaderTexture(0, new Identifier("server-notify", "error.png"));
-        RenderSystem.enableBlend();
-
+    private void renderTexture(DrawContext context, int x, int y, int width, int height) {
         int textureX = x - width / 2;
         int textureY = y - height / 2;
 
-        drawTexture(matrices, textureX, textureY, 0, 0, width, height, width, height);
-        RenderSystem.disableBlend();
+        context.drawTexture(new Identifier("server-notify", "error.png"), textureX, textureY, 0, 0, width, height, width, height);
 
         if (reason.equals("nullbimage")) {
             List<Text> errorLines = new ArrayList<>();
@@ -106,20 +109,20 @@ public class ErrorScreen extends Screen {
             for (Text line : errorLines) {
                 int textWidth = textRenderer.getWidth(line);
                 int textX = x - textWidth / 2;
-                drawTextWithShadow(matrices, textRenderer, line, textX, startY, color);
+                context.drawTextWithShadow(textRenderer, line, textX, startY, color);
                 startY += lineHeight;
             }
         }
     }
 
-    private void renderDismissText(MatrixStack matrices, TextRenderer textRenderer, double alpha) {
+    private void renderDismissText(DrawContext context, TextRenderer textRenderer, double alpha) {
         Text dismissText = Text.literal("Press ESC to dismiss");
         int textWidth = textRenderer.getWidth(dismissText);
         int textX = (width - textWidth) / 2;
         int textY = height - 20;
         int color = 0xFFFFFF | ((int) (255 * alpha) << 24);
 
-        drawTextWithShadow(matrices, textRenderer, dismissText, textX, textY, color);
+        context.drawTextWithShadow(textRenderer, dismissText, textX, textY, color);
     }
 
     double calculateAlpha() {

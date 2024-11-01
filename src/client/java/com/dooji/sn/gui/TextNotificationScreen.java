@@ -4,9 +4,11 @@ import com.dooji.sn.network.ClientPacketHandler;
 import com.dooji.sn.network.NotificationData;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.client.sound.PositionedSoundInstance;
@@ -38,7 +40,13 @@ public class TextNotificationScreen extends Screen {
 
     private SoundEvent createSoundEvent(String namespace, String path) {
         Identifier soundId = new Identifier(namespace, path);
-        return new SoundEvent(soundId);
+
+        if (!Registries.SOUND_EVENT.containsId(soundId)) {
+            SoundEvent soundEvent = SoundEvent.of(soundId);
+            Registry.register(Registries.SOUND_EVENT, soundId, soundEvent);
+        }
+
+        return Registries.SOUND_EVENT.get(soundId);
     }
 
     @Override
@@ -46,40 +54,43 @@ public class TextNotificationScreen extends Screen {
         super.init();
 
         if (notificationData.isDismissButtonShow()) {
-            addDrawableChild(new ButtonWidget(width / 2 - 50, height / 2 + 30, 100, 20, Text.literal("Dismiss"),
-                    button -> close()));
+            addDrawableChild(ButtonWidget.builder(Text.literal("Dismiss"), button -> close())
+                    .position(width / 2 - 50, height / 2 + 30)
+                    .size(100, 20)
+                    .build()
+            );
         }
     }
 
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
 
         playNotificationSound();
 
-        renderBackground(matrices);
+        renderBackground(context);
 
-        drawCenteredText(matrices, textRenderer, notificationData.getMessage(), width / 2, height / 2 - 10, 0xFFFFFF);
+        context.drawCenteredTextWithShadow(textRenderer, notificationData.getMessage(), width / 2, height / 2 - 10, 0xFFFFFF);
 
         if (notificationData.isDismissShow()) {
             double alpha = calculateAlpha();
 
-            renderDismissText(matrices, MinecraftClient.getInstance().textRenderer, alpha);
+            renderDismissText(context, MinecraftClient.getInstance().textRenderer, alpha);
 
             timer += delta;
             timer = timer % fullAnimationLength;
         }
 
-        super.render(matrices, mouseX, mouseY, delta);
+        super.render(context, mouseX, mouseY, delta);
     }
 
-    private void renderDismissText(MatrixStack matrices, TextRenderer textRenderer, double alpha) {
+    private void renderDismissText(DrawContext context, TextRenderer textRenderer, double alpha) {
         Text dismissText = Text.literal("Press ESC to dismiss");
         int textWidth = textRenderer.getWidth(dismissText);
         int textX = (width - textWidth) / 2;
         int textY = height - 20;
         int color = 0xFFFFFF | ((int) (255 * alpha) << 24);
 
-        drawTextWithShadow(matrices, textRenderer, dismissText, textX, textY, color);
+        context.drawTextWithShadow(textRenderer, dismissText, textX, textY, color);
     }
 
     double calculateAlpha() {
