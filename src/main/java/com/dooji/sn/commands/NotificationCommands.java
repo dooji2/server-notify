@@ -215,7 +215,7 @@ public class NotificationCommands {
         String soundPath = context.getArgument("sound_path", String.class);
         boolean dismissButton = false;
 
-        if (type.toLowerCase() == "text") {
+        if (type.equalsIgnoreCase("text")) {
             dismissButton = context.getArgument("dismiss_button", Boolean.class);
         }
 
