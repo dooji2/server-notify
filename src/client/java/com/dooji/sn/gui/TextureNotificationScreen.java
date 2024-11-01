@@ -2,15 +2,16 @@ package com.dooji.sn.gui;
 
 import com.dooji.sn.network.ClientPacketHandler;
 import com.dooji.sn.network.NotificationData;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.sound.SoundEvent;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
 
 public class TextureNotificationScreen extends Screen {
     private final NotificationData notificationData;
@@ -37,8 +38,14 @@ public class TextureNotificationScreen extends Screen {
     }
 
     private SoundEvent createSoundEvent(String namespace, String path) {
-        Identifier soundId = new Identifier(namespace, path);
-        return new SoundEvent(soundId);
+        Identifier soundId = Identifier.of(namespace, path);
+
+        if (!Registries.SOUND_EVENT.containsId(soundId)) {
+            SoundEvent soundEvent = SoundEvent.of(soundId);
+            Registry.register(Registries.SOUND_EVENT, soundId, soundEvent);
+        }
+
+        return Registries.SOUND_EVENT.get(soundId);
     }
 
     @Override
@@ -47,45 +54,39 @@ public class TextureNotificationScreen extends Screen {
     }
 
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        super.render(context, mouseX, mouseY, delta);
 
         playNotificationSound();
 
-        renderBackground(matrices);
-        renderTexture(matrices, notificationData.getTexture(), width / 2, height / 2, notificationData.getWidth(),
+        renderTexture(context, notificationData.getTexture(), width / 2, height / 2, notificationData.getWidth(),
                 notificationData.getHeight());
 
         if (notificationData.isDismissShow()) {
             double alpha = calculateAlpha();
 
-            renderDismissText(matrices, MinecraftClient.getInstance().textRenderer, alpha);
+            renderDismissText(context, MinecraftClient.getInstance().textRenderer, alpha);
 
             timer += delta;
             timer = timer % fullAnimationLength;
         }
-
-        super.render(matrices, mouseX, mouseY, delta);
     }
 
-    private void renderTexture(MatrixStack matrices, String texturePath, int x, int y, int width, int height) {
-        RenderSystem.setShaderTexture(0, new Identifier(notificationData.getNamespace(), texturePath));
-        RenderSystem.enableBlend();
-
+    private void renderTexture(DrawContext context, String texturePath, int x, int y, int width, int height) {
         int textureX = x - width / 2;
         int textureY = y - height / 2;
 
-        drawTexture(matrices, textureX, textureY, 0, 0, width, height, width, height);
-        RenderSystem.disableBlend();
+        context.drawTexture(Identifier.of(notificationData.getNamespace(), texturePath), textureX, textureY, 0, 0, width, height, width, height);
     }
 
-    private void renderDismissText(MatrixStack matrices, TextRenderer textRenderer, double alpha) {
+    private void renderDismissText(DrawContext context, TextRenderer textRenderer, double alpha) {
         Text dismissText = Text.literal("Press ESC to dismiss");
         int textWidth = textRenderer.getWidth(dismissText);
         int textX = (width - textWidth) / 2;
         int textY = height - 20;
         int color = 0xFFFFFF | ((int) (255 * alpha) << 24);
 
-        drawTextWithShadow(matrices, textRenderer, dismissText, textX, textY, color);
+        context.drawTextWithShadow(textRenderer, dismissText, textX, textY, color);
     }
 
     double calculateAlpha() {

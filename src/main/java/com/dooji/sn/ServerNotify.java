@@ -3,21 +3,27 @@ package com.dooji.sn;
 import com.dooji.sn.commands.NotificationCommands;
 import com.dooji.sn.network.NotificationConfig;
 import com.dooji.sn.network.NotificationPacket;
+import com.dooji.sn.network.PacketHandler;
 import com.google.gson.JsonObject;
 import com.mojang.brigadier.CommandDispatcher;
 
+import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
 
 public class ServerNotify implements ModInitializer {
 	@Override
 	public void onInitialize() {
 
 		NotificationConfig.initConfig();
+
+		if (FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) {
+			PacketHandler.register();
+		}
 
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
 
@@ -40,7 +46,7 @@ public class ServerNotify implements ModInitializer {
 							boolean dismiss_message = notification.get("dismiss_message").getAsBoolean();
 							boolean alwaysShow = notification.get("alwaysShow").getAsBoolean();
 
-							NotificationPacket.send((ServerPlayerEntity) handler.player, name, type, sound_namespace,
+							NotificationPacket.sendTextureNotification(handler.player, name, type, sound_namespace,
 									sound_path, namespace, texture, width, height, dismiss_message, alwaysShow);
 						} else if (type.equals("text")) {
 							String message = notification.get("message").getAsString();
@@ -48,7 +54,7 @@ public class ServerNotify implements ModInitializer {
 							boolean dismiss_message = notification.get("dismiss_message").getAsBoolean();
 							boolean alwaysShow = notification.get("alwaysShow").getAsBoolean();
 
-							NotificationPacket.send((ServerPlayerEntity) handler.player, name, type, sound_namespace,
+							NotificationPacket.sendTextNotification(handler.player, name, type, sound_namespace,
 									sound_path, message, dismiss_button, dismiss_message, alwaysShow);
 						} else if (type.equals("url")) {
 							String url = notification.get("url").getAsString();
@@ -57,7 +63,7 @@ public class ServerNotify implements ModInitializer {
 							boolean dismiss_message = notification.get("dismiss_message").getAsBoolean();
 							boolean alwaysShow = notification.get("alwaysShow").getAsBoolean();
 
-							NotificationPacket.send((ServerPlayerEntity) handler.player, name, type, sound_namespace,
+							NotificationPacket.sendURLNotification(handler.player, name, type, sound_namespace,
 									sound_path, url, width, height, dismiss_message, alwaysShow);
 						}
 					}

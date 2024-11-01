@@ -215,7 +215,7 @@ public class NotificationCommands {
         String soundPath = context.getArgument("sound_path", String.class);
         boolean dismissButton = false;
 
-        if (type.toLowerCase() == "text") {
+        if (type.equalsIgnoreCase("text")) {
             dismissButton = context.getArgument("dismiss_button", Boolean.class);
         }
 
@@ -344,41 +344,41 @@ public class NotificationCommands {
     }
 
     private static void displayTextureNotificationInfo(ServerCommandSource source, JsonObject notification) {
-        source.sendFeedback(Text.literal("Notification Info for UUID: " + notification.get("name").getAsString())
+        source.sendFeedback(() -> Text.literal("Notification Info for UUID: " + notification.get("name").getAsString())
                 .formatted(Formatting.YELLOW), true);
-        source.sendFeedback(Text.literal("Friendly Name: " + notification.get("friendly_name").getAsString()), false);
-        source.sendFeedback(Text.literal("Type: Texture"), false);
-        source.sendFeedback(Text.literal("Namespace: " + notification.get("namespace").getAsString()), false);
-        source.sendFeedback(Text.literal("Texture: " + notification.get("texture").getAsString()), false);
-        source.sendFeedback(Text.literal("Width: " + notification.get("width").getAsInt()), false);
-        source.sendFeedback(Text.literal("Height: " + notification.get("height").getAsInt()), false);
-        source.sendFeedback(Text.literal("Dismiss Message: " + notification.get("dismiss_message").getAsBoolean()),
+        source.sendFeedback(() -> Text.literal("Friendly Name: " + notification.get("friendly_name").getAsString()), false);
+        source.sendFeedback(() -> Text.literal("Type: Texture"), false);
+        source.sendFeedback(() -> Text.literal("Namespace: " + notification.get("namespace").getAsString()), false);
+        source.sendFeedback(() -> Text.literal("Texture: " + notification.get("texture").getAsString()), false);
+        source.sendFeedback(() -> Text.literal("Width: " + notification.get("width").getAsInt()), false);
+        source.sendFeedback(() -> Text.literal("Height: " + notification.get("height").getAsInt()), false);
+        source.sendFeedback(() -> Text.literal("Dismiss Message: " + notification.get("dismiss_message").getAsBoolean()),
                 false);
-        source.sendFeedback(Text.literal("Always Show: " + notification.get("alwaysShow").getAsBoolean()), false);
+        source.sendFeedback(() -> Text.literal("Always Show: " + notification.get("alwaysShow").getAsBoolean()), false);
     }
 
     private static void displayTextNotificationInfo(ServerCommandSource source, JsonObject notification) {
-        source.sendFeedback(Text.literal("Notification Info for UUID: " + notification.get("name").getAsString())
+        source.sendFeedback(() -> Text.literal("Notification Info for UUID: " + notification.get("name").getAsString())
                 .formatted(Formatting.YELLOW), true);
-        source.sendFeedback(Text.literal("Friendly Name: " + notification.get("friendly_name").getAsString()), false);
-        source.sendFeedback(Text.literal("Type: Text"), false);
-        source.sendFeedback(Text.literal("Message: " + notification.get("message").getAsString()), false);
-        source.sendFeedback(Text.literal("Dismiss Message: " + notification.get("dismiss_message").getAsBoolean()),
+        source.sendFeedback(() -> Text.literal("Friendly Name: " + notification.get("friendly_name").getAsString()), false);
+        source.sendFeedback(() -> Text.literal("Type: Text"), false);
+        source.sendFeedback(() -> Text.literal("Message: " + notification.get("message").getAsString()), false);
+        source.sendFeedback(() -> Text.literal("Dismiss Message: " + notification.get("dismiss_message").getAsBoolean()),
                 false);
-        source.sendFeedback(Text.literal("Always Show: " + notification.get("alwaysShow").getAsBoolean()), false);
+        source.sendFeedback(() -> Text.literal("Always Show: " + notification.get("alwaysShow").getAsBoolean()), false);
     }
 
     private static void displayURLNotificationInfo(ServerCommandSource source, JsonObject notification) {
-        source.sendFeedback(Text.literal("Notification Info for UUID: " + notification.get("name").getAsString())
+        source.sendFeedback(() -> Text.literal("Notification Info for UUID: " + notification.get("name").getAsString())
                 .formatted(Formatting.YELLOW), true);
-        source.sendFeedback(Text.literal("Friendly Name: " + notification.get("friendly_name").getAsString()), false);
-        source.sendFeedback(Text.literal("Type: URL"), false);
-        source.sendFeedback(Text.literal("URL: " + notification.get("url").getAsString()), false);
-        source.sendFeedback(Text.literal("Width: " + notification.get("width").getAsInt()), false);
-        source.sendFeedback(Text.literal("Height: " + notification.get("height").getAsInt()), false);
-        source.sendFeedback(Text.literal("Dismiss Message: " + notification.get("dismiss_message").getAsBoolean()),
+        source.sendFeedback(() -> Text.literal("Friendly Name: " + notification.get("friendly_name").getAsString()), false);
+        source.sendFeedback(() -> Text.literal("Type: URL"), false);
+        source.sendFeedback(() -> Text.literal("URL: " + notification.get("url").getAsString()), false);
+        source.sendFeedback(() -> Text.literal("Width: " + notification.get("width").getAsInt()), false);
+        source.sendFeedback(() -> Text.literal("Height: " + notification.get("height").getAsInt()), false);
+        source.sendFeedback(() -> Text.literal("Dismiss Message: " + notification.get("dismiss_message").getAsBoolean()),
                 false);
-        source.sendFeedback(Text.literal("Always Show: " + notification.get("alwaysShow").getAsBoolean()), false);
+        source.sendFeedback(() -> Text.literal("Always Show: " + notification.get("alwaysShow").getAsBoolean()), false);
     }
 
     private static void addNotification(ServerCommandSource source, String friendlyName, String type,
@@ -423,19 +423,19 @@ public class NotificationCommands {
         notificationsArray.add(notification);
         NotificationConfig.saveConfig(configObject);
 
-        source.sendFeedback(Text.of("Notification added successfully."), true);
+        source.sendFeedback(() -> Text.of("Notification added successfully."), true);
     }
 
     private static void listNotifications(ServerCommandSource source) {
         JsonObject configObject = NotificationConfig.loadConfig();
         JsonArray notificationsArray = configObject.getAsJsonArray("notifications");
 
-        source.sendFeedback(Text.literal("Notifications List:").formatted(Formatting.YELLOW), false);
+        source.sendFeedback(() -> Text.literal("Notifications List:").formatted(Formatting.YELLOW), false);
         for (int i = 0; i < notificationsArray.size(); i++) {
             JsonObject notification = notificationsArray.get(i).getAsJsonObject();
             String friendlyName = notification.get("friendly_name").getAsString();
             String type = notification.get("type").getAsString();
-            source.sendFeedback(Text.literal("- " + friendlyName + " - " + type), false);
+            source.sendFeedback(() -> Text.literal("- " + friendlyName + " - " + type), false);
         }
     }
 
@@ -443,12 +443,12 @@ public class NotificationCommands {
         JsonObject configObject = NotificationConfig.loadConfig();
         JsonArray notificationsArray = configObject.getAsJsonArray("notifications");
 
-        source.sendFeedback(Text.literal("Notification UUIDs:").formatted(Formatting.YELLOW), false);
+        source.sendFeedback(() -> Text.literal("Notification UUIDs:").formatted(Formatting.YELLOW), false);
         for (int i = 0; i < notificationsArray.size(); i++) {
             JsonObject notification = notificationsArray.get(i).getAsJsonObject();
             String uuid = notification.get("name").getAsString();
             String friendlyName = notification.get("friendly_name").getAsString();
-            source.sendFeedback(Text.literal("- " + uuid + " - " + friendlyName), false);
+            source.sendFeedback(() -> Text.literal("- " + uuid + " - " + friendlyName), false);
         }
     }
 
@@ -461,12 +461,12 @@ public class NotificationCommands {
             if (notification.get("name").getAsString().equals(uuid)) {
                 notificationsArray.remove(i);
                 NotificationConfig.saveConfig(configObject);
-                source.sendFeedback(Text.literal("Notification with UUID " + uuid + " removed successfully.")
+                source.sendFeedback(() -> Text.literal("Notification with UUID " + uuid + " removed successfully.")
                         .formatted(Formatting.GREEN), true);
                 return;
             }
         }
-        source.sendFeedback(Text.literal("Notification with UUID " + uuid + " not found.").formatted(Formatting.RED),
+        source.sendFeedback(() -> Text.literal("Notification with UUID " + uuid + " not found.").formatted(Formatting.RED),
                 true);
     }
 
@@ -514,12 +514,12 @@ public class NotificationCommands {
                 }
 
                 NotificationConfig.saveConfig(configObject);
-                source.sendFeedback(Text.literal("Notification with UUID " + uuid + " edited successfully.")
+                source.sendFeedback(() -> Text.literal("Notification with UUID " + uuid + " edited successfully.")
                         .formatted(Formatting.GREEN), true);
                 return;
             }
         }
-        source.sendFeedback(Text.literal("Notification with UUID " + uuid + " not found.").formatted(Formatting.RED),
+        source.sendFeedback(() -> Text.literal("Notification with UUID " + uuid + " not found.").formatted(Formatting.RED),
                 true);
     }
 }
