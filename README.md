@@ -1,7 +1,7 @@
 # Server Notify
 
 The image below is outdated, **Server Notify** now supports 1.19.2, 1.20.1, 1.21 and 1.21.1.
-Versions 1.20.1, 1.21 and 1.21.1 can be used on NeoForge with Sintrya Connector, Forgified Fabric API is required.
+**Requires Fabric API. Also compatible with Forge and NeoForge, using [Sinytra Connector](https://modrinth.com/mod/connector), requires [Forgified Fabric](https://modrinth.com/mod/forgified-fabric-api).**
 
 ![a](https://cdn.modrinth.com/data/cached_images/ebb68a4cdd0adf2c471f0fe0a063e2458da8b779.png)
 #
