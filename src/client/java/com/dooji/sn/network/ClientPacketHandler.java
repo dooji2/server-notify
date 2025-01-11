@@ -9,7 +9,6 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.minecraft.client.MinecraftClient;
 
-import java.io.File;
 import java.util.ArrayDeque;
 import java.util.Queue;
 import java.util.concurrent.Executors;
@@ -47,12 +46,17 @@ public class ClientPacketHandler {
     }
 
     private static void handleTextureNotification(MinecraftClient client, TextureNotificationPayload payload) {
-        NotificationConfig config = loadConfig();
+        NotificationConfig config = ConfigManager.loadConfig();
         String name = payload.name();
+        boolean alwaysShow = payload.alwaysShow();
+
+        if (config.getSeenNotifications().contains(name) && !alwaysShow) {
+            return;
+        }
 
         if (!config.getSeenNotifications().contains(name)) {
             config.getSeenNotifications().add(name);
-            saveConfig(config);
+            ConfigManager.saveConfig(config);
         }
 
         NotificationData notificationData = new NotificationData(
@@ -68,12 +72,17 @@ public class ClientPacketHandler {
     }
 
     private static void handleTextNotification(MinecraftClient client, TextNotificationPayload payload) {
-        NotificationConfig config = loadConfig();
+        NotificationConfig config = ConfigManager.loadConfig();
         String name = payload.name();
+        boolean alwaysShow = payload.alwaysShow();
+
+        if (config.getSeenNotifications().contains(name) && !alwaysShow) {
+            return;
+        }
 
         if (!config.getSeenNotifications().contains(name)) {
             config.getSeenNotifications().add(name);
-            saveConfig(config);
+            ConfigManager.saveConfig(config);
         }
 
         NotificationData notificationData = new NotificationData(
@@ -89,12 +98,17 @@ public class ClientPacketHandler {
     }
 
     private static void handleURLNotification(MinecraftClient client, URLNotificationPayload payload) {
-        NotificationConfig config = loadConfig();
+        NotificationConfig config = ConfigManager.loadConfig();
         String name = payload.name();
+        boolean alwaysShow = payload.alwaysShow();
+
+        if (config.getSeenNotifications().contains(name) && !alwaysShow) {
+            return;
+        }
 
         if (!config.getSeenNotifications().contains(name)) {
             config.getSeenNotifications().add(name);
-            saveConfig(config);
+            ConfigManager.saveConfig(config);
         }
 
         NotificationData notificationData = new NotificationData(
@@ -107,16 +121,6 @@ public class ClientPacketHandler {
             notificationQueue.add(notificationData);
             displayNextNotification(client);
         });
-    }
-
-    private static NotificationConfig loadConfig() {
-        File configDir = new File(MinecraftClient.getInstance().runDirectory, "config" + File.separator + "Server Notify");
-        return ConfigManager.loadConfig(configDir);
-    }
-
-    private static void saveConfig(NotificationConfig config) {
-        File configDir = new File(MinecraftClient.getInstance().runDirectory, "config" + File.separator + "Server Notify");
-        ConfigManager.saveConfig(config, configDir);
     }
 
     public static void displayNextNotification(MinecraftClient client) {
