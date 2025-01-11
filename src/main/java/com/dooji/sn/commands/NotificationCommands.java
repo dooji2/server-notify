@@ -84,6 +84,17 @@ public class NotificationCommands {
                                                 .executes(NotificationCommands::executeEditNotification)))))
                 .then(CommandManager.literal("info")
                         .then(CommandManager.argument("uuid", StringArgumentType.word())
+                                .suggests((context, builder) -> {
+                                    JsonObject configObject = NotificationConfig.loadConfig();
+                                    JsonArray notificationsArray = configObject.getAsJsonArray("notifications");
+                        
+                                    for (int i = 0; i < notificationsArray.size(); i++) {
+                                        String uuid = notificationsArray.get(i).getAsJsonObject().get("name").getAsString();
+                                        builder.suggest(uuid);
+                                    }
+                        
+                                    return builder.buildFuture();
+                                })
                                 .executes(NotificationCommands::executeNotificationInfo)))
                 .then(CommandManager.literal("list")
                         .executes(NotificationCommands::executeListNotifications))
