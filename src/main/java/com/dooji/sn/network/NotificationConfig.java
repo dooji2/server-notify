@@ -10,11 +10,15 @@ import java.io.*;
 
 public class NotificationConfig {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private static final File CONFIG_FILE = new File(FabricLoader.getInstance().getConfigDir().toFile(),
-            "notifications.json");
+    private static final File BASE_CONFIG_DIR = new File(FabricLoader.getInstance().getConfigDir().toFile(), "Server Notify");
+    private static final File NOTIFICATIONS_FILE = new File(BASE_CONFIG_DIR, "notifications.json");
 
     public static void initConfig() {
-        if (!CONFIG_FILE.exists()) {
+        if (!BASE_CONFIG_DIR.exists()) {
+            BASE_CONFIG_DIR.mkdirs();
+        }
+
+        if (!NOTIFICATIONS_FILE.exists()) {
             try {
                 JsonObject root = new JsonObject();
                 JsonArray notificationsArray = new JsonArray();
@@ -28,13 +32,13 @@ public class NotificationConfig {
     }
 
     private static void writeConfig(JsonObject jsonObject) throws IOException {
-        try (Writer writer = new FileWriter(CONFIG_FILE)) {
+        try (Writer writer = new FileWriter(NOTIFICATIONS_FILE)) {
             GSON.toJson(jsonObject, writer);
         }
     }
 
     public static JsonObject loadConfig() {
-        try (Reader reader = new FileReader(CONFIG_FILE)) {
+        try (Reader reader = new FileReader(NOTIFICATIONS_FILE)) {
             return GSON.fromJson(reader, JsonObject.class);
         } catch (IOException e) {
             e.printStackTrace();
