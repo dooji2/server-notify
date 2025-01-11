@@ -13,7 +13,6 @@ import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 
-import java.io.File;
 import java.util.ArrayDeque;
 import java.util.Queue;
 import java.util.concurrent.Executors;
@@ -77,11 +76,15 @@ public class ClientPacketHandler {
             alwaysShow = buf.readBoolean();
         }
 
-        NotificationConfig config = loadConfig();
+        NotificationConfig config = ConfigManager.loadConfig();
+
+        if (config.getSeenNotifications().contains(name) && !alwaysShow) {
+            return;
+        }
 
         if (!config.getSeenNotifications().contains(name)) {
             config.getSeenNotifications().add(name);
-            saveConfig(config);
+            ConfigManager.saveConfig(config);
 
             String finalURL = url;
             String finalNamespace = namespace;
@@ -151,18 +154,6 @@ public class ClientPacketHandler {
                 }
             });
         }
-    }
-
-    private static NotificationConfig loadConfig() {
-        File configDir = new File(MinecraftClient.getInstance().runDirectory,
-                "config" + File.separator + "Server Notify");
-        return ConfigManager.loadConfig(configDir);
-    }
-
-    private static void saveConfig(NotificationConfig config) {
-        File configDir = new File(MinecraftClient.getInstance().runDirectory,
-                "config" + File.separator + "Server Notify");
-        ConfigManager.saveConfig(config, configDir);
     }
 
     public static void displayNextNotification(MinecraftClient client) {
