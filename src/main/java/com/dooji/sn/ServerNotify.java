@@ -43,28 +43,28 @@ public class ServerNotify implements ModInitializer {
 							String texture = notification.get("texture").getAsString();
 							int width = notification.get("width").getAsInt();
 							int height = notification.get("height").getAsInt();
-							boolean dismiss_message = notification.get("dismiss_message").getAsBoolean();
+							boolean dismissMessage = notification.get("dismissMessage").getAsBoolean();
 							boolean alwaysShow = notification.get("alwaysShow").getAsBoolean();
 
 							NotificationPacket.sendTextureNotification(handler.player, name, type, sound_namespace,
-									sound_path, namespace, texture, width, height, dismiss_message, alwaysShow);
+									sound_path, namespace, texture, width, height, dismissMessage, alwaysShow);
 						} else if (type.equals("text")) {
 							String message = notification.get("message").getAsString();
-							boolean dismiss_button = notification.get("dismiss_button").getAsBoolean();
-							boolean dismiss_message = notification.get("dismiss_message").getAsBoolean();
+							boolean dismissButton = notification.get("dismissButton").getAsBoolean();
+							boolean dismissMessage = notification.get("dismissMessage").getAsBoolean();
 							boolean alwaysShow = notification.get("alwaysShow").getAsBoolean();
 
 							NotificationPacket.sendTextNotification(handler.player, name, type, sound_namespace,
-									sound_path, message, dismiss_button, dismiss_message, alwaysShow);
+									sound_path, message, dismissButton, dismissMessage, alwaysShow);
 						} else if (type.equals("url")) {
 							String url = notification.get("url").getAsString();
 							int width = notification.get("width").getAsInt();
 							int height = notification.get("height").getAsInt();
-							boolean dismiss_message = notification.get("dismiss_message").getAsBoolean();
+							boolean dismissMessage = notification.get("dismissMessage").getAsBoolean();
 							boolean alwaysShow = notification.get("alwaysShow").getAsBoolean();
 
 							NotificationPacket.sendURLNotification(handler.player, name, type, sound_namespace,
-									sound_path, url, width, height, dismiss_message, alwaysShow);
+									sound_path, url, width, height, dismissMessage, alwaysShow);
 						}
 					}
 				}
