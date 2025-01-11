@@ -77,11 +77,15 @@ public class ClientPacketHandler {
             alwaysShow = buf.readBoolean();
         }
 
-        NotificationConfig config = loadConfig();
+        NotificationConfig config = ConfigManager.loadConfig();
+
+        if (config.getSeenNotifications().contains(name) && !alwaysShow) {
+            return;
+        }
 
         if (!config.getSeenNotifications().contains(name)) {
             config.getSeenNotifications().add(name);
-            saveConfig(config);
+            ConfigManager.saveConfig(config);
 
             String finalURL = url;
             String finalNamespace = namespace;
@@ -151,18 +155,6 @@ public class ClientPacketHandler {
                 }
             });
         }
-    }
-
-    private static NotificationConfig loadConfig() {
-        File configDir = new File(MinecraftClient.getInstance().runDirectory,
-                "config" + File.separator + "Server Notify");
-        return ConfigManager.loadConfig(configDir);
-    }
-
-    private static void saveConfig(NotificationConfig config) {
-        File configDir = new File(MinecraftClient.getInstance().runDirectory,
-                "config" + File.separator + "Server Notify");
-        ConfigManager.saveConfig(config, configDir);
     }
 
     public static void displayNextNotification(MinecraftClient client) {
