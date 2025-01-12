@@ -2,6 +2,7 @@ package com.dooji.sn.gui;
 
 import com.dooji.sn.network.ClientPacketHandler;
 import com.dooji.sn.network.NotificationData;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
@@ -46,7 +47,7 @@ public class TextNotificationScreen extends Screen {
         super.init();
 
         if (notificationData.isDismissButtonShow()) {
-            addDrawableChild(new ButtonWidget(width / 2 - 50, height / 2 + 30, 100, 20, Text.literal("Dismiss"),
+            addDrawableChild(new ButtonWidget(width / 2 - 50, height - 40, 100, 20, Text.literal("Dismiss"),
                     button -> close()));
         }
     }
