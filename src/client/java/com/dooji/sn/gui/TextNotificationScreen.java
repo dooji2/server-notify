@@ -55,7 +55,7 @@ public class TextNotificationScreen extends Screen {
 
         if (notificationData.isDismissButtonShow()) {
             addDrawableChild(ButtonWidget.builder(Text.literal("Dismiss"), button -> close())
-                    .position(width / 2 - 50, height / 2 + 30)
+                    .position(width / 2 - 50, height - 40)
                     .size(100, 20)
                     .build()
             );
