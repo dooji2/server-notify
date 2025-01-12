@@ -61,9 +61,8 @@ public class ErrorScreen extends Screen {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        super.render(context, mouseX, mouseY, delta);
         playNotificationSound();
-    
-        renderBackground(context, mouseX, mouseY, delta);
     
         context.fill(0, 0, width, 40, 0xFF000000);
         context.fill(0, 40, width, 70, 0xFF8B0000);
@@ -97,8 +96,6 @@ public class ErrorScreen extends Screen {
             timer += delta;
             timer = timer % fullAnimationLength;
         }
-    
-        super.render(context, mouseX, mouseY, delta);
     }
 
     private void renderDismissText(DrawContext context, TextRenderer textRenderer, double alpha) {
