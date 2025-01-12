@@ -2,6 +2,7 @@ package com.dooji.sn.gui;
 
 import com.dooji.sn.network.ClientPacketHandler;
 import com.dooji.sn.network.NotificationData;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -60,57 +61,44 @@ public class ErrorScreen extends Screen {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        super.render(context, mouseX, mouseY, delta);
-
         playNotificationSound();
-
-        renderTexture(context, width / 2, height / 2, 500,
-                281);
-
-        if (notificationData.isDismissShow()) {
-            double alpha = calculateAlpha();
-
-            renderDismissText(context, MinecraftClient.getInstance().textRenderer, alpha);
-
-            timer += delta;
-            timer = timer % fullAnimationLength;
-        }
-    }
-
-    private void renderTexture(DrawContext context, int x, int y, int width, int height) {
-        int textureX = x - width / 2;
-        int textureY = y - height / 2;
-
-        context.drawTexture(Identifier.of("server-notify", "error.png"), textureX, textureY, 0, 0, width, height, width, height);
-
+    
+        renderBackground(context);
+    
+        context.fill(0, 0, width, 40, 0xFF000000);
+        context.fill(0, 40, width, 70, 0xFF8B0000);
+    
+        context.drawCenteredTextWithShadow(textRenderer, Text.literal("Server Notify"), width / 2, 15, 0xFFFFFF);
+        context.drawCenteredTextWithShadow(textRenderer, Text.literal("Please report this error to the server owner!"), width / 2, 50, 0xFFFFFF);
+    
         if (reason.equals("nullbimage")) {
             List<Text> errorLines = new ArrayList<>();
             errorLines.add(Text.literal("The image could not be downloaded. Please check the URL."));
             errorLines.add(Text.of("URL: " + notificationData.getURL()));
             errorLines.add(Text.of("Notification UUID: " + notificationData.getName()));
-
+    
             int lineHeight = 10;
             int totalHeight = errorLines.size() * lineHeight;
-
-            int startY = y - totalHeight / 2;
-            startY += height / 3;
-            startY -= lineHeight * 3;
-
+    
+            int startY = height / 2 - totalHeight / 2;
+            startY += 30;
+    
             int color = 0xFFFFFF;
-            int maxWidth = 0;
-
+            
             for (Text line : errorLines) {
-                int textWidth = textRenderer.getWidth(line);
-                maxWidth = Math.max(maxWidth, textWidth);
-            }
-
-            for (Text line : errorLines) {
-                int textWidth = textRenderer.getWidth(line);
-                int textX = x - textWidth / 2;
-                context.drawTextWithShadow(textRenderer, line, textX, startY, color);
+                context.drawCenteredTextWithShadow(textRenderer, line, width / 2, startY, color);
                 startY += lineHeight;
             }
         }
+    
+        if (notificationData.isDismissShow()) {
+            double alpha = calculateAlpha();
+            renderDismissText(context, MinecraftClient.getInstance().textRenderer, alpha);
+            timer += delta;
+            timer = timer % fullAnimationLength;
+        }
+    
+        super.render(context, mouseX, mouseY, delta);
     }
 
     private void renderDismissText(DrawContext context, TextRenderer textRenderer, double alpha) {
