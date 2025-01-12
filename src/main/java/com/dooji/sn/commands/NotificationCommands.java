@@ -213,11 +213,11 @@ public class NotificationCommands {
             case "texture":
             case "width":
             case "height":
-            case "dismissMessage":
+            case "dismissmessage":
             case "alwaysshow":
             case "message":
             case "url":
-            case "dismissButton":
+            case "dismissbutton":
                 editNotification(source, uuid, whatToEdit, newValue);
                 return 1;
             default:
@@ -432,7 +432,7 @@ public class NotificationCommands {
                     case "height":
                         notification.addProperty("height", Integer.parseInt(newValue));
                         break;
-                    case "dismissMessage":
+                    case "dismissmessage":
                         notification.addProperty("dismissMessage", Boolean.parseBoolean(newValue));
                         break;
                     case "alwaysshow":
@@ -444,7 +444,7 @@ public class NotificationCommands {
                     case "url":
                         notification.addProperty("url", newValue);
                         break;
-                    case "dismissButton":
+                    case "dismissbutton":
                         notification.addProperty("dismissButton", Boolean.parseBoolean(newValue));
                         break;
                     default:
