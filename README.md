@@ -1,73 +1,35 @@
 # Server Notify
 
-The image below is outdated, **Server Notify** now supports 1.19.2, 1.20.1, 1.21 and 1.21.1.
-Versions 1.20.1, 1.21 and 1.21.1 can be used on NeoForge with Sintrya Connector, Forgified Fabric API is required.
+**Server Notify** is a Minecraft mod that lets you display notifications to players joining your Minecraft server. Easily set up notifications using commands, with options for texture, text, or URL-based notifications.
 
-![a](https://cdn.modrinth.com/data/cached_images/ebb68a4cdd0adf2c471f0fe0a063e2458da8b779.png)
-#
+**Required on Client and Server!**
 
-[<img src="https://i.imgur.com/HUk4jEx.png" alt="Resource Downloader - GitHub Page" width="240" height="120">](https://github.com/dooji2/server-notify/issues)
+**Requires Fabric API. Also compatible with Forge and NeoForge, using [Sinytra Connector](https://modrinth.com/mod/connector), requires [Forgified Fabric API](https://modrinth.com/mod/forgified-fabric-api).**
 
-Please check out the following before proceeding:
+## Notification Types
+1. **Texture Notifications**: Display textures from any loaded resource pack.
+2. **Text-only Notifications**: Display simple messages.
+3. **Image from URL**: Display images from a specified URL.
 
-<details>
-<summary>Getting started</summary>
-This mod is command-based, and it's fairly simple to use!
-There are three types of notifications, texture, text, and URL (more to be added soon!).
-
-For now, let's go over the commands.
-By typing `/server-notify`, you'll see there are quite a few options available.
+## Getting Started
+1. **Command-based**: All features are accessed via commands in-game.
+2. **Commands**: Type `/server-notify` to view available options.
 
 ![Main Command](https://cdn.modrinth.com/data/cached_images/7f02cd2aa929d68d5ecadac2262bc86a0c11ad91.png)
 
-**Edit** lets you edit the value of a notification's variable, for example its namespace or texture path!
+### Command Options:
+- **Edit**: Modify a notification's properties.
+- **Info**: View details of a specific notification.
+- **List**: Display all notifications.
+- **New**: Create a new notification.
+- **Remove**: Delete a notification.
+- **UUID-List**: Show all notifications with their UUIDs.
 
-**Info** gives you info on a certain notification.
+## Creating Notifications
 
-**List** gives you a list of all notifications (Notification Name - Type)
+Use the command `/server-notify new type "Notification Name"` to create a notification, replacing `"Notification Name"` with your preferred name and `type` with **texture**, **text**, or **url**.
 
-**New** lets you create a new notification.
-
-**Remove** lets you remove a notification.
-
-**UUID-List** gives you a list of all notifications (Notification UUID - Name)
-
-All commands have some auto-suggestions, so I will not go over all of them as they are pretty straightforward.
-
-To create a new notification, all types have a base command:
-```
-/server-notify new "Notification Name" type type
-```
-Both **type** entries should be the same; they can be **texture**, **text** or **url** (for now).
-
-To find out how to create a new notification, please choose the type of notification you'd like to create and then click on one of the dropdowns below.
-<details>
-<summary>Texture Notification</summary>
-A texture notification lets you display any texture from any loaded resource pack in-game.
-
-An example command would be:
-```
-/server-notify new "Notification Name" texture texture <sound_namespace> <sound_path> <texture_namespace> <texture_path> <width> <height> <dismissMessage> <alwaysShow>
-```
-
-**"Notification Name"** can be anything, however it must be in quotation marks. It is for you to identify the notification later on.
-
-**<sound_namespace>** is the namespace of the sound you'd like to play when the notification is shown.
-
-**<sound_path>** is the path of the sound you'd like to play when the notification is shown.
-
-**<texture_namespace>** is your resource pack's namespace.
-
-**<texture_path>** is the path to your texture.
-
-**<width>** is the width of your texture.
-
-**<height>** is the height of your texture.
-
-**<dismissMessage>** displays a "Press ESC to dismiss" text at the bottom of the screen.
-
-**<alwaysShow>** shows the notification to a player when they join even if they have already seen it.
-</details>
+### Notification Types and Commands
 
 <details>
 <summary>Text-only Notification</summary>
@@ -75,7 +37,7 @@ A text notification lets you display any message as a notification.
 
 An example command would be:
 ```
-/server-notify new "Notification Name" text text <sound_namespace> <sound_path> <message> <dismissButton> <dismissMessage> <alwaysShow>
+/server-notify new text "Notification Name" <sound_namespace> <sound_path> <message> <dismissButton> <dismissMessage> <alwaysShow>
 ```
 
 **"Notification Name"** can be anything, however it must be in quotation marks. It is for you to identify the notification later on.
@@ -91,6 +53,11 @@ An example command would be:
 **<dismissMessage>** displays a "Press ESC to dismiss" text at the bottom of the screen.
 
 **<alwaysShow>** shows the notification to a player when they join even if they have already seen it.
+
+**Another Text Notification example would be:**
+```
+/server-notify new text "Notification Test" minecraft "ambient.cave" "hey, testing" false true true
+```
 </details>
 
 <details>
@@ -99,7 +66,7 @@ An image notification lets you display any image from a URL.
 
 An example command would be:
 ```
-/server-notify new "Notification Name" url url <sound_namespace> <sound_path> <url> <width> <height> <dismissMessage> <alwaysShow>
+/server-notify new url "Notification Name" <sound_namespace> <sound_path> <url> <width> <height> <dismissMessage> <alwaysShow>
 ```
 
 **"Notification Name"** can be anything, however it must be in quotation marks. It is for you to identify the notification later on.
@@ -110,12 +77,17 @@ An example command would be:
 
 **<url>** is your image URL in quotation marks.
 
-**<width>** is the width of your texture.
+**<width>** is the width of your image (you might have to use a scaled down resolution to accomodate for Minecraft's GUI scale, for example for an image that's 1920x1080, scaled down while also keeping the aspect ratio would be 480 by 270).
 
-**<height>** is the height of your texture.
+**<height>** is the height of your image (you might have to use a scaled down resolution to accomodate for Minecraft's GUI scale, for example for an image that's 1920x1080, scaled down while also keeping the aspect ratio would be 480 by 270).
 
 **<dismissMessage>** displays a "Press ESC to dismiss" text at the bottom of the screen.
 
 **<alwaysShow>** shows the notification to a player when they join even if they have already seen it.
+
+**Another Image Notification example would be:**
+```
+/server-notify new url "Image Test" minecraft "ambient.cave" "https://some_direct_image_url" 480 270 true true
+```
 </details>
 </details>
