@@ -53,63 +53,44 @@ public class ErrorScreen extends Screen {
 
     @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-
         playNotificationSound();
-
+    
         renderBackground(matrices);
-        renderTexture(matrices, width / 2, height / 2, 500,
-                281);
-
-        if (notificationData.isDismissShow()) {
-            double alpha = calculateAlpha();
-
-            renderDismissText(matrices, MinecraftClient.getInstance().textRenderer, alpha);
-
-            timer += delta;
-            timer = timer % fullAnimationLength;
-        }
-
-        super.render(matrices, mouseX, mouseY, delta);
-    }
-
-    private void renderTexture(MatrixStack matrices, int x, int y, int width, int height) {
-        RenderSystem.setShaderTexture(0, new Identifier("server-notify", "error.png"));
-        RenderSystem.enableBlend();
-
-        int textureX = x - width / 2;
-        int textureY = y - height / 2;
-
-        drawTexture(matrices, textureX, textureY, 0, 0, width, height, width, height);
-        RenderSystem.disableBlend();
-
+    
+        fill(matrices, 0, 0, width, 40, 0xFF000000);
+        fill(matrices, 0, 40, width, 70, 0xFF8B0000);
+    
+        drawCenteredText(matrices, textRenderer, Text.literal("Server Notify"), width / 2, 15, 0xFFFFFF);
+        drawCenteredText(matrices, textRenderer, Text.literal("Please report this error to the server owner!"), width / 2, 50, 0xFFFFFF);
+    
         if (reason.equals("nullbimage")) {
             List<Text> errorLines = new ArrayList<>();
             errorLines.add(Text.literal("The image could not be downloaded. Please check the URL."));
             errorLines.add(Text.of("URL: " + notificationData.getURL()));
             errorLines.add(Text.of("Notification UUID: " + notificationData.getName()));
-
+    
             int lineHeight = 10;
             int totalHeight = errorLines.size() * lineHeight;
-
-            int startY = y - totalHeight / 2;
-            startY += height / 3;
-            startY -= lineHeight * 3;
-
+    
+            int startY = height / 2 - totalHeight / 2;
+            startY += 30;
+    
             int color = 0xFFFFFF;
-            int maxWidth = 0;
-
+            
             for (Text line : errorLines) {
-                int textWidth = textRenderer.getWidth(line);
-                maxWidth = Math.max(maxWidth, textWidth);
-            }
-
-            for (Text line : errorLines) {
-                int textWidth = textRenderer.getWidth(line);
-                int textX = x - textWidth / 2;
-                drawTextWithShadow(matrices, textRenderer, line, textX, startY, color);
+                drawCenteredText(matrices, textRenderer, line, width / 2, startY, color);
                 startY += lineHeight;
             }
         }
+    
+        if (notificationData.isDismissShow()) {
+            double alpha = calculateAlpha();
+            renderDismissText(matrices, MinecraftClient.getInstance().textRenderer, alpha);
+            timer += delta;
+            timer = timer % fullAnimationLength;
+        }
+    
+        super.render(matrices, mouseX, mouseY, delta);
     }
 
     private void renderDismissText(MatrixStack matrices, TextRenderer textRenderer, double alpha) {
